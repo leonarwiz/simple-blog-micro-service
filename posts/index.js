@@ -1,9 +1,11 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import crypto from 'node:crypto'
+import cors from 'cors'
 
 const app = express()
 app.use(bodyParser.json())
+app.use(cors())
 
 // todo : set up database to handle posts storaging
 const posts = {}

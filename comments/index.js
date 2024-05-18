@@ -2,9 +2,11 @@ import express from 'express'
 import {randomBytes} from 'node:crypto'
 import bodyParser from 'body-parser'
 import { connect } from 'node:http2'
+import cors from 'cors'
 
 const app = express()
 app.use(bodyParser.json())
+app.use(cors())
 
 // key : id
 // value : Comment object : {id, string}
