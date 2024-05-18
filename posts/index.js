@@ -11,7 +11,6 @@ app.use(cors())
 const posts = {}
 
 app.get('/posts', (req, res)=>{
-    console.log(posts)
     res.send(posts)
 })
 
