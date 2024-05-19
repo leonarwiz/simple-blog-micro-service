@@ -1,6 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import axios from 'axios'
 
 
 
@@ -10,10 +11,7 @@ app.use(cors())
 
 const posts = {}
 
-app.post('/events', (req, res) => {
-    const {type, data} = req.body 
-    console.log({type})
-
+const eventHandler = (type, data) => {
     if(type === 'PostCreated'){
         const {id, title} = data
         console.log({id, title})
@@ -22,13 +20,27 @@ app.post('/events', (req, res) => {
     }
 
     if(type === 'CommentCreated'){
-        const {id, content, postId} = data
-        console.log({id, content, postId})
+        const {id, content, status, postId} = data
         posts[postId].comments.push({
-            id, content
+            id, content, status
         })
     }
 
+    if(type === 'CommentUpdated'){
+        const {id, postId, status, content} = data
+        const comments = posts[postId].comments
+        const comment = comments.find(comment => {
+            return comment.id === id
+        })
+        comment.status = status
+        comment.content = content
+    }
+}
+
+app.post('/events', (req, res) => {
+    const {type, data} = req.body 
+    eventHandler(type, data)
+    console.log(posts)
     res.send({})
 })
 
@@ -36,6 +48,15 @@ app.get('/posts', (req, res) => {
     res.send(posts)
 })
 
-app.listen(4002, () => {
+app.listen(4002, async () => {
     console.log("Listening on 4002")
+
+    const res = await axios.get('http://localhost:4005/events')
+        .catch((err) => {
+            console.error(err)
+        })
+    for(let event of res.data){
+        console.log("Prcosessing event: ", event.type)
+        eventHandler(event.type, event.data)
+    }
 })
