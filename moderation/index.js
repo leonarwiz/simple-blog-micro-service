@@ -10,20 +10,25 @@ app.post('/events', async (req, res) => {
     console.log('received event')
     if(type === 'CommentCreated'){
         const status = data.content.includes('orange') ? 'rejected' : 'approved'
-        await axios.post('http://localhost:4005/events', {
-            type: 'CommentModerated',
-            data:{
-                id: data.id,
-                postId: data.postId,
-                status,
-                content: data.content
-            }
-        })
+        try{
+            axios.post('http://event-bus-srv:4005/events', {
+                type: 'CommentModerated',
+                data:{
+                    id: data.id,
+                    postId: data.postId,
+                    status,
+                    content: data.content
+                }
+            })
+        }catch(err){
+            console.error(err)
+        }
     }
-
     res.send({})
 })
 
 app.listen(4003, () => {
+    console.log("v2 port 4003")
     console.log("Listening on 4003")
+
 })
