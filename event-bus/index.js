@@ -9,27 +9,35 @@ app.use(cors())
 
 const events = []
 
-app.post('/events', (req, res) => {
+app.post('/events', async (req, res) => {
     const event = req.body
 
     events.push(event)
 
-    axios.post('http://localhost:4000/events', event)
-        .catch((err) => {
-            console.error(err)
-        })
-    axios.post('http://localhost:4001/events', event)
-        .catch((err) => {
-            console.error(err)
-        })
-    axios.post('http://localhost:4002/events', event)
-        .catch((err) => {
-            console.error(err)
-        })
-    axios.post('http://localhost:4003/events', event)
-        .catch((err) => {
-            console.error(err)
-        })
+    try {
+        await axios.post('http://posts-clusterip-srv:4000/events', event);
+    } catch (err) {
+        console.error('Error posting to posts-clusterip-srv:', err.message);
+    }
+
+    // axios.post('http://posts-clusterip-srv:4000/events', event)
+    //     .catch((err) => {
+    //         console.error(err)
+    //     })
+    // axios.post('http://localhost:4001/events', event)
+    //     .catch((err) => {
+    //         console.error(err)
+    //     })
+    // axios.post('http://localhost:4002/events', event)
+    //     .catch((err) => {
+    //         console.error(err)
+    //     })
+    // axios.post('http://localhost:4003/events', event)
+    //     .catch((err) => {
+    //         console.error(err)
+    //     })
+
+    console.log("Received Event: ", event.type)
     
     res.send({status: 'OK'})
 })
@@ -40,6 +48,7 @@ app.get('/events', (req, res) => {
 
 
 app.listen(4005, () => {
+    console.log("V2")
     console.log("Listening on 4005")
 })
 
